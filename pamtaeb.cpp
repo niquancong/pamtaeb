@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -44,7 +46,7 @@ int select_path(char* result){
 		case FNERR_BUFFERTOOSMALL  : std::cout << "FNERR_BUFFERTOOSMALL\n";  break;
 		case FNERR_INVALIDFILENAME : std::cout << "FNERR_INVALIDFILENAME\n"; break;
 		case FNERR_SUBCLASSFAILURE : std::cout << "FNERR_SUBCLASSFAILURE\n"; break;
-		default                    : std::cout << "You cancelled.\n";
+		default                    : std::cout << "Operation cancelled.\n";
 		}
 		exit(-1);
 	}
@@ -88,20 +90,27 @@ int reverse_filename(char* result, char* path){
 
 	int status = 0;
 	std::string path_string(path);
+	std::string result_string;
+	std::string filename;
 
 	std::size_t filename_start = path_string.find_last_of("/\\");
-	std::size_t filename_end = path_string.find_last_of(".", filename_start);
+	std::size_t filename_end = path_string.find_last_of(".");
 	std::size_t filename_length;
 
 	if(filename_end == std::string::npos){
 		std::cout << "Warning: attempting to reverse a filename with no extension!" << std::endl;
-		filename_length = path_string.length() - filename_start;
+		filename_length = path_string.length() - filename_start - 1;
 	}else{
-		filename_length = filename_end - filename_start;
+		filename_length = filename_end - filename_start - 1;
 	}
+
+	filename = path_string.substr(filename_start + 1, filename_length);
+	result_string.append(path_string.substr(0, filename_start + 1));
+	std::reverse(filename.begin(), filename.end());
+	result_string.append(filename);
+	result_string.append(path_string.substr(filename_end));
 	
-	path_string.copy(result, filename_start);
-	// not done yet but i've lost motivation for today xd
+	std::strcpy(result, result_string.c_str());
 
 	return status;
 }
@@ -125,7 +134,7 @@ int main(int argc, char** argv){
 
 	reverse_filename(map_output_path, map_input_path);
 	std::ofstream map_output(map_output_path);
-	
+	// todo: check if file exists/is empty so i don't erase the map like the dumbass that i am
 
 	// cleanup
 	map_input.close();
