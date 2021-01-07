@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <windows.h>
 #include "Pamtaeb.h"
 
 int select_path(char* result){
@@ -85,6 +86,16 @@ int verify_input(char* path, std::ifstream* file, const char* extension){
 	return status;
 }
 
+int reverse_string(char* input){
+	// reverses string
+
+	int status = 0;
+	std::string input_string(input);
+	std::reverse(input_string.begin(), input_string.end());
+
+	return status;
+}
+
 int reverse_filename(char* result, char* path){
 	// reverses filename from a path, the extension is preserved
 
@@ -115,6 +126,16 @@ int reverse_filename(char* result, char* path){
 	return status;
 }
 
+int file_exists(char* path){
+	// checks if a file exists, output 1 if exists and 0 if not
+
+	int status = -1;
+	std::ifstream file(path);
+	file.fail() ? status = 0 : status = 1;
+
+	return status;
+}
+
 int main(int argc, char** argv){
 	// initializations
 	char* map_input_path = new char[MAX_PATH];
@@ -132,9 +153,15 @@ int main(int argc, char** argv){
 		return -1;
 	}
 
+	// reverses file name and checks if it already exists
 	reverse_filename(map_output_path, map_input_path);
-	std::ofstream map_output(map_output_path);
-	// todo: check if file exists/is empty so i don't erase the map like the dumbass that i am
+	if(file_exists(map_output_path) == 0){
+		std::ofstream map_output(map_output_path);
+	}else{
+		std::cout << "Error: file creation failed! Does a reversed version already exist? " << std::endl;
+	}
+
+
 
 	// cleanup
 	map_input.close();
